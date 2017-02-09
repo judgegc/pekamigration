@@ -1,0 +1,32 @@
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+import { MaterialModule } from '@angular/material';
+
+import { AppComponent } from './app.component';
+
+import {PekaApiService} from './peka-api/peka-api.service';
+import { DataProviderService } from './data-provider.service';
+
+import { ViewportComponent } from './viewport/viewport.component';
+import { SearchBoxComponent } from './search-box/search-box.component';
+import { DescriptionComponent } from './description/description.component'; 
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    ViewportComponent,
+    SearchBoxComponent,
+    DescriptionComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    MaterialModule.forRoot()
+  ],
+  providers: [PekaApiService, DataProviderService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }

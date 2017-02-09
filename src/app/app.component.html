@@ -1,0 +1,5 @@
+<viewport [data]="data" [options]="options" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)"></viewport>
+<section class="info-panel">
+    <search-box [nodes]="data.nodes" (searchComplete)="searchComplete($event)"></search-box>
+    <description [hidden]="!isShowDescription"></description>
+</section>

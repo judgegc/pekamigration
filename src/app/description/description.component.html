@@ -1,0 +1,23 @@
+<md-card [ngSwitch]="displayMode">
+  <div *ngSwitchCase="'streamer'">
+    Зрителей: {{totalViewers}}
+  </div>
+  <div *ngSwitchCase="'viewer'">
+    Смотрит сейчас:
+    <md-list *ngIf="watchChannels.length > 0">
+      <md-list-item *ngFor="let channel of watchChannels">
+        {{channel}}
+      </md-list-item>
+    </md-list>
+  </div>
+  <div *ngSwitchCase="'peka'">
+    <md-list>
+      <md-list-item>
+        Стримеров: {{pekaStats.totalStreams}}
+      </md-list-item>
+      <md-list-item>
+        Пекарей: {{pekaStats.totalUsers}}
+      </md-list-item>
+    </md-list>
+  </div>
+</md-card>

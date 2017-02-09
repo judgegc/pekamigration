@@ -1,0 +1,15 @@
+<md-card>
+  <md-input-container>
+    <input #queryInput [value]="input" md-input placeholder="Пека ID" (keyup)="search(queryInput.value)">
+  </md-input-container>
+  <md-list *ngIf="autocompleteList.length > 0">
+    <md-list-item *ngFor="let variant of autocompleteList">
+      <a (click)="OnClickAutoselectItem(variant)">{{variant.name}}</a>
+      <md-chip-list [ngSwitch]="variant.group">
+        <md-chip color="primary" selected="true" *ngSwitchCase="'viewer'">Зритель</md-chip>
+        <md-chip  color="accent" selected="true" *ngSwitchCase="'streamer'">Стример</md-chip>       
+        <md-chip color="warn" selected="true" *ngSwitchCase="'peka'">Пека</md-chip>
+      </md-chip-list>
+    </md-list-item>
+  </md-list>
+</md-card>
