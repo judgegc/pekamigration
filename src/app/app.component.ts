@@ -70,9 +70,17 @@ export class AppComponent {
           "centralGravity": 1.3,
           "springLength": 145
         },
+
         minVelocity: 0.64,
         timestep: 0.5,
-        adaptiveTimestep: true
+        adaptiveTimestep: true,
+        stabilization: {
+          enabled: true,
+          iterations: 1000,
+          updateInterval: 100,
+          onlyDynamicEdges: false,
+          fit: true
+        }
       }
     };
 
@@ -96,8 +104,7 @@ export class AppComponent {
       this.network.focusNode(id);
       this.isShowDescription = true;
       this.updateDescription(id);
-    }catch(ex)
-    {
+    } catch (ex) {
       console.log('Нода не найдена. Работаем дальше');
     }
   }
