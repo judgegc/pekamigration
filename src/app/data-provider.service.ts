@@ -15,7 +15,7 @@ import * as vis from 'vis';
 export class DataProviderService {
 
   private data: vis.Data;
-  private watchTimer: Observable<number>;
+  private watchTimer: NodeJS.Timer;
   private readonly UPDATE_INTERVAL = 15000;
 
 
@@ -38,30 +38,20 @@ export class DataProviderService {
 
 
   public startWatch() {
-    this.watchTimer = Observable.timer(1000, this.UPDATE_INTERVAL);
-    this.watchTimer.subscribe(this.updateStreamsList);
-  }
 
-
-  private updateStreamsList = (tick: number) => {
     this.api.getStreams()
       .map(streams => streams.content)
-      .subscribe(streams => this.processStreams(streams), e => console.log(e));
-  }
+      .flatMap((streams: Stream[]) => Observable.zip(
 
+        Observable.from(streams),
+        Observable.from(streams.map((stream: Stream) => this.api.getViewers(stream.owner.id))).concatAll(),
+        (stream: Stream, viewers: ViewersList) => ({ stream: stream, viewers: viewers })
 
-  private processStreams = (streams: Stream[]) => {
+        )
+        .toArray())
+      .subscribe({next: streams => {
 
-    let updatedStreams: { stream: Stream, viewers: ViewersList }[] = [];
-    Observable.zip(
-      Observable.from(streams),
-      Observable.from(streams.map((stream: Stream) => this.api.getViewers(stream.owner.id))).concatAll(),
-      (stream: Stream, viewers: ViewersList) => ({ stream: stream, viewers: viewers }))
-      .subscribe({
-        next: (streamWithViewers) => {
-          updatedStreams.push(streamWithViewers);
-        }, complete: () => {
-          let diffs = this.comparator.getTransforms(updatedStreams);
+          let diffs = this.comparator.getTransforms(streams);
 
           diffs.nodes.remove.splice(diffs.nodes.remove.indexOf(1), 1);////don't touch peka
 
@@ -72,25 +62,25 @@ export class DataProviderService {
 
           //remove outdated edges
           (this.data.edges as vis.DataSet<vis.Edge>)
-          .remove(diffs.edges.remove.map(e => NetworkHelper.getEdgeId(e)));
-          
+            .remove(diffs.edges.remove.map(e => NetworkHelper.getEdgeId(e)));
+
 
           //add new edges
           (this.data.edges as vis.DataSet<vis.Edge>)
-            .add(diffs.edges.add.map(e => ({id: NetworkHelper.getEdgeId(e), from: e.from, to: e.to})));
+            .add(diffs.edges.add.map(e => ({ id: NetworkHelper.getEdgeId(e), from: e.from, to: e.to })));
 
 
           //add new nodes
           (this.data.nodes as vis.DataSet<vis.Node>)
             .add(diffs.nodes.add.map(id => {
 
-              let streamer = updatedStreams.find(s => s.stream.id == id);
+              let streamer = streams.find(s => s.stream.id == id);
               if (streamer !== undefined) {
                 return { id: id, label: streamer.stream.owner.name, group: 'streamer' };
               }
 
               let viewerNode: Owner;
-              updatedStreams
+              streams
                 .some(s => {
                   let viewer = s.viewers.result.users.find(u => u.id == id);
                   if (viewer === undefined) {
@@ -109,13 +99,14 @@ export class DataProviderService {
 
           //connect streamers to root(peka)
           let streamers = (this.data.nodes as vis.DataSet<vis.Node>)
-          .get(updatedStreams.map(s => s.stream.id));
+            .get(streams.map(s => s.stream.id));
 
           (this.data.edges as vis.DataSet<vis.Edge>)
-          .add(streamers.map(s => ({id: NetworkHelper.getEdgeId({from: 1, to: s.id as number}),from: 1, to: s.id})));
-          
-        }
-      });
+            .add(streamers.map(s => ({ id: NetworkHelper.getEdgeId({ from: 1, to: s.id as number }), from: 1, to: s.id })));
 
+            this.watchTimer = setTimeout(() => this.startWatch(), this.UPDATE_INTERVAL);
+
+      }});
   }
+
 }
