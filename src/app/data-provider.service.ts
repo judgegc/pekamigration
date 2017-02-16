@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 
 import { PekaApiService } from './peka-api/peka-api.service';
 import { Stream } from './peka-api/stream.interface';
@@ -7,6 +7,7 @@ import { ViewersList } from './peka-api/viewers-list.interface';
 import { Owner } from './peka-api/owner.interface';
 import { NetworkHelper } from './network-helper';
 import { SnapshotComparator } from './snapshot-comparator';
+import { RequestStatus, Status } from './request-status.interface';
 
 import * as vis from 'vis';
 
@@ -20,6 +21,8 @@ export class DataProviderService {
 
 
   private comparator: SnapshotComparator;
+
+  public OnRequestStatus = new Subject();
 
   constructor(private api: PekaApiService) {
     this.data = {
@@ -38,7 +41,9 @@ export class DataProviderService {
 
 
   public startWatch() {
+    this.OnRequestStatus.next({ status: Status.BEGIN });
 
+    let it = 0;
     this.api.getStreams()
       .map(streams => streams.content)
       .flatMap((streams: Stream[]) => Observable.zip(
@@ -47,9 +52,11 @@ export class DataProviderService {
         Observable.from(streams.map((stream: Stream) => this.api.getViewers(stream.owner.id))).concatAll(),
         (stream: Stream, viewers: ViewersList) => ({ stream: stream, viewers: viewers })
 
-        )
+      )
+      .do(x => {++it; this.OnRequestStatus.next({ status: Status.INPROGRESS, progress: Math.round(100 / streams.length * it) })})
         .toArray())
-      .subscribe({next: streams => {
+      .subscribe({
+        next: streams => {
 
           let diffs = this.comparator.getTransforms(streams);
 
@@ -104,9 +111,17 @@ export class DataProviderService {
           (this.data.edges as vis.DataSet<vis.Edge>)
             .add(streamers.map(s => ({ id: NetworkHelper.getEdgeId({ from: 1, to: s.id as number }), from: 1, to: s.id })));
 
-            this.watchTimer = setTimeout(() => this.startWatch(), this.UPDATE_INTERVAL);
+          this.watchTimer = setTimeout(() => this.startWatch(), this.UPDATE_INTERVAL);
 
-      }});
+          this.OnRequestStatus.next({ status: Status.END });
+
+        }, error: e => {
+          console.error('Ошибка, код красный!');
+
+          this.watchTimer = setTimeout(() => this.startWatch(), this.UPDATE_INTERVAL);
+          this.OnRequestStatus.next({ status: Status.END });
+        }
+      });
   }
 
 }

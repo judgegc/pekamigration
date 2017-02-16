@@ -1,4 +1,5 @@
 <viewport [data]="data" [options]="options" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)"></viewport>
+<md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress"></md-progress-bar>
 <section class="info-panel">
     <search-box [nodes]="data.nodes" (searchComplete)="searchComplete($event)"></search-box>
     <description [hidden]="!isShowDescription"></description>

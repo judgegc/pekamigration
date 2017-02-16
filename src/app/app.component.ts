@@ -5,6 +5,7 @@ import { PekaApiService } from './peka-api/peka-api.service';
 import { DataProviderService } from './data-provider.service';
 import { ViewportComponent } from './viewport/viewport.component';
 import { DescriptionComponent } from './description/description.component';
+import { RequestStatus, Status } from './request-status.interface';
 
 import * as vis from 'vis';
 
@@ -25,7 +26,27 @@ export class AppComponent {
 
   private isShowDescription: boolean = false;
 
+  private requestInProgress: boolean = false;
+  private requestProgress: number = 0;
+
   public constructor(private dataProvider: DataProviderService) {
+
+    this.dataProvider.OnRequestStatus.subscribe({
+      next: (x: RequestStatus) => {
+        switch (x.status) {
+          case Status.BEGIN:
+            this.requestInProgress = true;
+            break;
+          case Status.INPROGRESS:
+            this.requestProgress = x.progress
+            break;
+          case Status.END:
+            this.requestProgress = 0;
+            this.requestInProgress = false;
+            break;
+        }
+      }
+    });
 
     this.data = this.dataProvider.networkData;
     this.dataProvider.startWatch();
@@ -123,7 +144,7 @@ export class AppComponent {
         break
       case 'peka':
         let sum = this.network.getSummaries();
-        this.description.setPeka({ totalStreams: sum.totalStreamers, totalUsers: sum.totalUsers });
+        this.description.setPeka({ totalStreams: sum.totalStreamers, totalUsers: sum.totalUsers - 1 });//- peka
         break;
     }
   }
