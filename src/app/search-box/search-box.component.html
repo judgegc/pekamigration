@@ -1,6 +1,6 @@
 <md-card>
   <md-input-container>
-    <input #queryInput [value]="input" md-input placeholder="Пека ID" (keyup)="search(queryInput.value)">
+    <input [(ngModel)]="input" md-input placeholder="Пека ID" (ngModelChange)="search($event)" (keyup)="confirm($event)">
   </md-input-container>
   <md-list *ngIf="autocompleteList.length > 0">
     <md-list-item *ngFor="let variant of autocompleteList">

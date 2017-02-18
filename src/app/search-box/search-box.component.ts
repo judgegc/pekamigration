@@ -3,6 +3,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 
+import { DataProviderService } from './../data-provider.service';
+import { RequestStatus, Status } from './../request-status.interface';
+
 @Component({
   selector: 'search-box',
   templateUrl: './search-box.component.html',
@@ -18,29 +21,47 @@ export class SearchBoxComponent implements OnInit {
   private input: string = '';
   private readonly AUTOCOMPLETE_MAX_VARIANTS = 5;
 
-  constructor() { }
+
+  constructor(private dataProvider: DataProviderService) { }
 
   ngOnInit() {
     this.searchQuery
       .debounceTime(500)
-      .distinctUntilChanged()
       .subscribe({
         next: q => {
           this.autocompleteList = q.length > 0 ?
             this.buildAutocompleteList(q).slice(0, this.AUTOCOMPLETE_MAX_VARIANTS) :
             [];
-
-          if (this.autocompleteList.length > 0 && this.autocompleteList[0].distance === 0) {
-            this.searchComplete.emit(this.autocompleteList[0].id);
-            this.autocompleteList = [];
-          }
         }
       });
+
+
+
+    this.dataProvider.OnRequestStatus.subscribe({
+      next: (s: RequestStatus) => {
+        if (s.status == Status.END && this.input !== undefined) {
+          this.searchQuery.next(this.input);
+        }
+      }
+    });
   }
 
 
   private search(input: string) {
     this.searchQuery.next(input);
+  }
+
+  private confirm(event) {
+    if (event.keyCode == 13) {
+
+      if (this.autocompleteList.length > 0 && this.autocompleteList[0].distance === 0) {
+
+        this.searchComplete.emit(this.autocompleteList[0].id);
+        this.autocompleteList = [];
+        
+      }
+
+    }
   }
 
   private buildAutocompleteList(query: string) {
