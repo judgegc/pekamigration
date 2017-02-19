@@ -1,0 +1,25 @@
+#.travis.yml
+
+language: node_js
+node_js:
+  - "6.9"
+
+branches:
+  only:
+    - master
+
+before_script:
+  - npm install -g @angular/cli
+
+script:
+  - ng build --prod --base-href /pekamigration/
+
+after_script:
+  - bash ./deploy-ghp.sh
+
+env:
+  global:
+  - GH_REF: github.com/judgegc/pekamigration.git
+
+
+
