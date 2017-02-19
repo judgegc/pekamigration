@@ -1,10 +1,10 @@
-import { PekamigrationPage } from './app.po';
+import { PekamigrationPage  } from './app.po';
 
-describe('pekamigration App', function() {
-  let page: PekamigrationPage;
+describe('pekamigration App', () => {
+  let page: PekamigrationPage ;
 
   beforeEach(() => {
-    page = new PekamigrationPage();
+    page = new PekamigrationPage ();
   });
 
   it('should display message saying app works', () => {
