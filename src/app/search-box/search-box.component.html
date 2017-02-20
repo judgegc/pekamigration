@@ -1,15 +1,16 @@
 <md-card>
   <md-input-container>
-    <input mdInput [(ngModel)]="input" md-input placeholder="Пека ID" (ngModelChange)="search($event)" (keyup)="confirm($event)">
+    <input mdInput [(ngModel)]="input" md-input placeholder="Пека ID" (ngModelChange)="search($event)" (keyup)="confirm($event)" [mdAutocomplete]="auto">
   </md-input-container>
-  <md-list *ngIf="autocompleteList.length > 0">
-    <md-list-item *ngFor="let variant of autocompleteList">
-      <a (click)="OnClickAutoselectItem(variant)">{{variant.name}}</a>
+
+  <md-autocomplete #auto="mdAutocomplete">
+    <md-option *ngFor="let variant of autocompleteList" [value]="variant.name" (click)="OnClickAutoselectItem(variant)">
+      {{ variant.name }}
       <md-chip-list [ngSwitch]="variant.group">
-        <md-chip color="primary" selected="true" *ngSwitchCase="'viewer'">Зритель</md-chip>
-        <md-chip  color="accent" selected="true" *ngSwitchCase="'streamer'">Стример</md-chip>       
+        <md-chip color="primary" selected="true" *ngSwitchCase="'viewer'">{{variant.name.length > 8? 'З': 'Зритель'}}</md-chip>
+        <md-chip color="accent" selected="true" *ngSwitchCase="'streamer'">{{variant.name.length > 8? 'С': 'Стример'}}</md-chip>
         <md-chip color="warn" selected="true" *ngSwitchCase="'peka'">Пека</md-chip>
       </md-chip-list>
-    </md-list-item>
-  </md-list>
+    </md-option>
+  </md-autocomplete>
 </md-card>
