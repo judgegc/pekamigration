@@ -10,7 +10,6 @@ import * as vis from 'vis';
 export class ViewportComponent {
 
   @Input() data: vis.Data;
-  @Input() options: vis.Options;
   @Output() selectNode = new EventEmitter<number>();
   @Output() deselectNode = new EventEmitter();
 
@@ -20,7 +19,7 @@ export class ViewportComponent {
   constructor(private container: ElementRef) { }
 
   ngAfterViewInit() {
-    this.network = new vis.Network(this.container.nativeElement, this.data, this.options);
+    this.network = new vis.Network(this.container.nativeElement, this.data);
     this.network.on('deselectNode', () => this.deselectNode.emit());
     this.network.on('selectNode', (p: vis.Properties) => this.selectNode.emit(Number(p.nodes[0])));
   }
@@ -45,6 +44,11 @@ export class ViewportComponent {
       totalStreamers: totalStreamers, 
       totalUsers: (this.data.nodes as vis.DataSet<vis.Node>).length - totalStreamers};
     
+  }
+
+  public setOptions(options: vis.Options)
+  {
+    this.network.setOptions(options);
   }
 
 }

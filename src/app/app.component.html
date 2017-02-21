@@ -1,6 +1,18 @@
-<viewport [data]="data" [options]="options" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)"></viewport>
-<md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress"></md-progress-bar>
-<section class="info-panel">
-    <search-box [nodes]="data.nodes" (searchComplete)="searchComplete($event)"></search-box>
-    <description [hidden]="!isShowDescription"></description>
-</section>
+<md-sidenav-container>
+    <md-sidenav #settingsnav align="end" mode="over">
+        <settings [options]="{dragNodes: options.interaction.dragNodes}" (change)="settingChange($event)"></settings>
+    </md-sidenav>
+
+    <viewport [data]="data" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)"></viewport>
+    <md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress"></md-progress-bar>
+
+    <section class="info-panel">
+        <search-box [nodes]="data.nodes" (searchComplete)="searchComplete($event)"></search-box>
+        <description [hidden]="!isShowDescription"></description>
+    </section>
+
+    <button md-mini-fab class="settings-btn" [color]="primary" (click)="settingsnav.open()">
+        <md-icon class="settings-icon" svgIcon="settings" [color]="primary"></md-icon>
+    </button>
+
+</md-sidenav-container>

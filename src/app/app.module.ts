@@ -11,14 +11,16 @@ import { DataProviderService } from './data-provider.service';
 
 import { ViewportComponent } from './viewport/viewport.component';
 import { SearchBoxComponent } from './search-box/search-box.component';
-import { DescriptionComponent } from './description/description.component'; 
+import { DescriptionComponent } from './description/description.component';
+import { SettingsComponent } from './settings/settings.component'; 
 
 @NgModule({
   declarations: [
     AppComponent,
     ViewportComponent,
     SearchBoxComponent,
-    DescriptionComponent
+    DescriptionComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

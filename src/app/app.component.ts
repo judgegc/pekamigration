@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import * as io from 'socket.io-client';
+import {DomSanitizer} from '@angular/platform-browser';
+import {MdIconRegistry} from '@angular/material';
+
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { PekaApiService } from './peka-api/peka-api.service';
 import { DataProviderService } from './data-provider.service';
@@ -7,6 +9,7 @@ import { ViewportComponent } from './viewport/viewport.component';
 import { DescriptionComponent } from './description/description.component';
 import { RequestStatus, Status } from './request-status.interface';
 
+import * as io from 'socket.io-client';
 import * as vis from 'vis';
 
 
@@ -29,7 +32,11 @@ export class AppComponent {
   private requestInProgress: boolean = false;
   private requestProgress: number = 0;
 
-  public constructor(private dataProvider: DataProviderService) {
+
+  public constructor(private dataProvider: DataProviderService, mdIconRegistry: MdIconRegistry, sanitizer: DomSanitizer) {
+
+    mdIconRegistry.addSvgIcon('settings', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/md-settings.svg'));
+
 
     this.dataProvider.OnRequestStatus.subscribe({
       next: (x: RequestStatus) => {
@@ -48,9 +55,6 @@ export class AppComponent {
       }
     });
 
-    this.data = this.dataProvider.networkData;
-    this.dataProvider.startWatch();
-
     this.options = {
       groups: {
         peka: { color: { background: '#FBC02D' }, borderWidth: 1, size: 80 },
@@ -58,7 +62,8 @@ export class AppComponent {
         viewer: { color: { background: '#455A64' }, borderWidth: 1, size: 20 }
       },
       interaction: {
-        hover: true
+        hover: true,
+        dragNodes: false
       },
       layout: {
         improvedLayout: true
@@ -105,8 +110,16 @@ export class AppComponent {
       }
     };
 
+    this.data = this.dataProvider.networkData;
+    this.dataProvider.startWatch();  
+
   }
 
+  ngAfterViewInit() {
+
+    this.network.setOptions(this.options);
+    
+  }
 
   //event from viewport 
   private deselectNode() {
@@ -147,6 +160,18 @@ export class AppComponent {
         this.description.setPeka({ totalStreams: sum.totalStreamers, totalUsers: sum.totalUsers - 1 });//- peka
         break;
     }
+  }
+
+  private settingChange(opt: {name: string, value: any})
+  {
+    switch(opt.name)
+    {
+      case 'dragNodes':
+      this.options.interaction.dragNodes = opt.value;
+      break;
+    }
+
+    this.network.setOptions(this.options);
   }
 }
 
