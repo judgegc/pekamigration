@@ -3,7 +3,7 @@
         <settings [options]="{dragNodes: options.interaction.dragNodes}" (change)="settingChange($event)"></settings>
     </md-sidenav>
 
-    <viewport [data]="data" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)"></viewport>
+    <viewport [data]="data" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)" (stabilized)="stabilized($event)"></viewport>
     <md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress"></md-progress-bar>
 
     <section class="info-panel">

@@ -12,6 +12,7 @@ export class ViewportComponent {
   @Input() data: vis.Data;
   @Output() selectNode = new EventEmitter<number>();
   @Output() deselectNode = new EventEmitter();
+  @Output() stabilized = new EventEmitter<number>();
 
 
   private network: vis.Network;
@@ -22,6 +23,7 @@ export class ViewportComponent {
     this.network = new vis.Network(this.container.nativeElement, this.data);
     this.network.on('deselectNode', () => this.deselectNode.emit());
     this.network.on('selectNode', (p: vis.Properties) => this.selectNode.emit(Number(p.nodes[0])));
+    this.network.on('stabilized', (e: {iterations: number}) => {this.stabilized.emit(e.iterations)});
   }
 
   public focusNode(id: number) {

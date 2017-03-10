@@ -32,6 +32,7 @@ export class AppComponent {
   private requestInProgress: boolean = false;
   private requestProgress: number = 0;
 
+  private isSlowMode: boolean = false;
 
   public constructor(private dataProvider: DataProviderService, mdIconRegistry: MdIconRegistry, sanitizer: DomSanitizer) {
 
@@ -98,6 +99,7 @@ export class AppComponent {
         },
 
         minVelocity: 0.64,
+        maxVelocity: 50,
         timestep: 0.5,
         adaptiveTimestep: true,
         stabilization: {
@@ -172,6 +174,17 @@ export class AppComponent {
     }
 
     this.network.setOptions(this.options);
+  }
+
+  private stabilized(iterations: number)
+  {
+    if(iterations > 2000 && !this.isSlowMode)
+    {
+      this.isSlowMode = true;
+      this.options.physics.maxVelocity = 5;
+      this.network.setOptions(this.options);
+      console.log('Переход в slow mode');
+    }
   }
 }
 
