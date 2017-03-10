@@ -13,7 +13,7 @@ import { CurrentBonuses } from './resources/currentbonuses';
 export class PekaApiService {
 
   private static readonly httpEntryPoint: string = 'https://funstream.tv';
-  private static readonly wsEntryPoint = 'wss://chat.funstream.tv';
+  private static readonly wsEntryPoint = 'wss://chat.peka2.tv';
 
   private ws: SocketIOClient.Socket;
 
