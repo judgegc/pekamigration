@@ -18,6 +18,10 @@ export class DescriptionComponent implements OnInit {
   ngOnInit() {
   }
 
+  public getMode(): string
+  {
+    return this.displayMode;
+  }
   public setMode(mode: string)
   {
     this.displayMode = mode;

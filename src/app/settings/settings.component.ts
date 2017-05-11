@@ -16,7 +16,7 @@ export class SettingsComponent implements OnInit {
   ngOnInit() {
   }
 
-  private dragNodesChange(e: MdSlideToggleChange) {
+  public dragNodesChange(e: MdSlideToggleChange) {
     this.change.emit({name: 'dragNodes', value: e.checked});
   }
 

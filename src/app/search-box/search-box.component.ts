@@ -16,9 +16,11 @@ export class SearchBoxComponent implements OnInit {
   @Input() nodes: vis.DataSet<vis.Node>;
   @Output() searchComplete = new EventEmitter<number>();
 
+  public input: string = '';
+
   private searchQuery: Subject<string> = new Subject<string>();
   private autocompleteList: { id: number, name: string, distance: number, group: string }[] = [];
-  private input: string = '';
+
   private readonly AUTOCOMPLETE_MAX_VARIANTS = 5;
 
 
@@ -47,11 +49,15 @@ export class SearchBoxComponent implements OnInit {
   }
 
 
-  private search(input: string) {
+  public search(input: string) {
     this.searchQuery.next(input);
   }
 
-  private confirm(event) {
+  public getAutocompleteList()
+  {
+    return this.autocompleteList;
+  }
+  public confirm(event) {
     if (event.keyCode == 13) {
 
       if (this.autocompleteList.length > 0 && this.autocompleteList[0].distance === 0) {
@@ -117,7 +123,7 @@ export class SearchBoxComponent implements OnInit {
     return matrix[b.length][needle.length];
   }
 
-  private OnClickAutoselectItem(user: { id: number, name: string, distance: number, group: string }) {
+  public OnClickAutoselectItem(user: { id: number, name: string, distance: number, group: string }) {
     this.input = user.name;
     this.autocompleteList = [];
     this.searchComplete.emit(user.id);

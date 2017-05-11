@@ -1,4 +1,4 @@
-<md-card [ngSwitch]="displayMode">
+<md-card [ngSwitch]="getMode()">
   <div *ngSwitchCase="'streamer'">
     Зрителей: {{totalViewers}}
   </div>

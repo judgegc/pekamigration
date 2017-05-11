@@ -16,7 +16,7 @@ import * as vis from 'vis';
 export class DataProviderService {
 
   private data: vis.Data;
-  private watchTimer: NodeJS.Timer;
+  private watchTimer;
   private readonly UPDATE_INTERVAL = 15000;
 
 

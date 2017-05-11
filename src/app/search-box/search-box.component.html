@@ -4,7 +4,7 @@
   </md-input-container>
 
   <md-autocomplete #auto="mdAutocomplete">
-    <md-option *ngFor="let variant of autocompleteList" [value]="variant.name" (click)="OnClickAutoselectItem(variant)">
+    <md-option *ngFor="let variant of getAutocompleteList()" [value]="variant.name" (click)="OnClickAutoselectItem(variant)">
       {{ variant.name }}
       <md-chip-list [ngSwitch]="variant.group">
         <md-chip color="primary" selected="true" *ngSwitchCase="'viewer'">{{variant.name.length > 8? 'З': 'Зритель'}}</md-chip>

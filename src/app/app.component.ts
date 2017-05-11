@@ -25,12 +25,12 @@ export class AppComponent {
   private socket: SocketIOClient.Socket;
 
   private data: vis.Data;
-  private options: vis.Options;
+  public options: vis.Options;
 
-  private isShowDescription: boolean = false;
+  public isShowDescription: boolean = false;
 
-  private requestInProgress: boolean = false;
-  private requestProgress: number = 0;
+  public requestInProgress: boolean = false;
+  public requestProgress: number = 0;
 
   private isSlowMode: boolean = false;
 
@@ -122,20 +122,28 @@ export class AppComponent {
     this.network.setOptions(this.options);
     
   }
+  public getData()
+  {
+    return this.data;
+  }
 
+  public nodes()
+  {
+    return this.data.nodes;
+  }
   //event from viewport 
-  private deselectNode() {
+  public deselectNode(e) {
     this.isShowDescription = false;
   }
 
   //event from viewport
-  private selectNode(id: number) {
+  public selectNode(id: number) {
     this.isShowDescription = true;
     this.updateDescription(id);
   }
 
   //event from search box
-  private searchComplete(id: number) {
+  public searchComplete(id: number) {
     try {
       this.network.focusNode(id);
       this.isShowDescription = true;
@@ -144,6 +152,7 @@ export class AppComponent {
       console.log('Нода не найдена. Работаем дальше');
     }
   }
+
 
 
   private updateDescription(id: number) {
@@ -164,7 +173,7 @@ export class AppComponent {
     }
   }
 
-  private settingChange(opt: {name: string, value: any})
+  public settingChange(opt: {name: string, value: any})
   {
     switch(opt.name)
     {
@@ -176,7 +185,7 @@ export class AppComponent {
     this.network.setOptions(this.options);
   }
 
-  private stabilized(iterations: number)
+  public stabilized(iterations: number)
   {
     if(iterations > 2000 && !this.isSlowMode)
     {
