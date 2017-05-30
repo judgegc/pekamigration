@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {MdIconRegistry} from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
+import { MdIconRegistry } from '@angular/material';
 
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { PekaApiService } from './peka-api/peka-api.service';
@@ -8,6 +8,14 @@ import { DataProviderService } from './data-provider.service';
 import { ViewportComponent } from './viewport/viewport.component';
 import { DescriptionComponent } from './description/description.component';
 import { RequestStatus, Status } from './request-status.interface';
+import { AllChatsListenerService } from './all-chats-listener.service';
+import { NetworkHelper } from './network-helper';
+
+import { NetworkSettings } from './config/network-settings';
+
+import { IMessage } from './peka-api/types/message.interface';
+
+import { ChatsActivitiesVisualizer } from './modules/chats-activities-visualizer';
 
 import * as io from 'socket.io-client';
 import * as vis from 'vis';
@@ -23,8 +31,12 @@ export class AppComponent {
   @ViewChild(DescriptionComponent) description: DescriptionComponent;
 
   private socket: SocketIOClient.Socket;
+  private isSlowMode: boolean = false;
+  private _data: vis.Data;
 
-  private data: vis.Data;
+  private messagesVisualizer: ChatsActivitiesVisualizer;
+
+
   public options: vis.Options;
 
   public isShowDescription: boolean = false;
@@ -32,13 +44,24 @@ export class AppComponent {
   public requestInProgress: boolean = false;
   public requestProgress: number = 0;
 
-  private isSlowMode: boolean = false;
+  ngAfterViewInit() {
+    this.network.setOptions(this.options);
+    this.messagesVisualizer = new ChatsActivitiesVisualizer(this.network, this.chatListener, this.dataProvider);
+    this.messagesVisualizer.start();
+  }
 
-  public constructor(private dataProvider: DataProviderService, mdIconRegistry: MdIconRegistry, sanitizer: DomSanitizer) {
+  public get data() {
+    return this._data;
+  }
+
+  public constructor(private dataProvider: DataProviderService, private chatListener: AllChatsListenerService, mdIconRegistry: MdIconRegistry, sanitizer: DomSanitizer) {
 
     mdIconRegistry.addSvgIcon('settings', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/md-settings.svg'));
+    
+    this.options = NetworkSettings;
 
-
+    this.chatListener.start();
+    
     this.dataProvider.OnRequestStatus.subscribe({
       next: (x: RequestStatus) => {
         switch (x.status) {
@@ -56,80 +79,13 @@ export class AppComponent {
       }
     });
 
-    this.options = {
-      groups: {
-        peka: { color: { background: '#FBC02D' }, borderWidth: 1, size: 80 },
-        streamer: { color: { background: '#1976D2' }, borderWidth: 1, size: 50 },
-        viewer: { color: { background: '#455A64' }, borderWidth: 1, size: 20 }
-      },
-      interaction: {
-        hover: true,
-        dragNodes: false
-      },
-      layout: {
-        improvedLayout: true
-      },
-      nodes: {
-        shape: 'dot',
-        borderWidth: 1,
-        size: 30,
-        color: {
-          border: '#222222',
-          background: '#666666',
-          highlight: {
-            border: '#222222',
-            background: '#7B1FA2'
-          }
-        },
-        font: { color: '#000000', align: 'center' }
-      },
-      edges: {
-        color:
-        {
-          color: 'lightgray',
-          highlight: '#9C27B0'
-        },
-        smooth: false
-      },
-      physics: {
-        "barnesHut": {
-          "gravitationalConstant": -80000,
-          "centralGravity": 1.3,
-          "springLength": 145
-        },
-
-        minVelocity: 0.64,
-        maxVelocity: 50,
-        timestep: 0.5,
-        adaptiveTimestep: true,
-        stabilization: {
-          enabled: true,
-          iterations: 1000,
-          updateInterval: 100,
-          onlyDynamicEdges: false,
-          fit: true
-        }
-      }
-    };
-
-    this.data = this.dataProvider.networkData;
-    this.dataProvider.startWatch();  
+    this._data = this.dataProvider.networkData;
+    this.dataProvider.startWatch();
 
   }
 
-  ngAfterViewInit() {
-
-    this.network.setOptions(this.options);
-    
-  }
-  public getData()
-  {
-    return this.data;
-  }
-
-  public nodes()
-  {
-    return this.data.nodes;
+  public nodes() {
+    return this._data.nodes;
   }
   //event from viewport 
   public deselectNode(e) {
@@ -173,22 +129,18 @@ export class AppComponent {
     }
   }
 
-  public settingChange(opt: {name: string, value: any})
-  {
-    switch(opt.name)
-    {
+  public settingChange(opt: { name: string, value: any }) {
+    switch (opt.name) {
       case 'dragNodes':
-      this.options.interaction.dragNodes = opt.value;
-      break;
+        this.options.interaction.dragNodes = opt.value;
+        break;
     }
 
     this.network.setOptions(this.options);
   }
 
-  public stabilized(iterations: number)
-  {
-    if(iterations > 2000 && !this.isSlowMode)
-    {
+  public stabilized(iterations: number) {
+    if (iterations > 2000 && !this.isSlowMode) {
       this.isSlowMode = true;
       this.options.physics.maxVelocity = 5;
       this.network.setOptions(this.options);

@@ -19,8 +19,8 @@ export class DataProviderService {
   private watchTimer;
   private readonly UPDATE_INTERVAL = 15000;
 
-
   private comparator: SnapshotComparator;
+  private streaamOwner: { [owner: number]: number; } = {};
 
   public OnRequestStatus = new Subject();
 
@@ -35,6 +35,10 @@ export class DataProviderService {
     this.comparator = new SnapshotComparator(this.data);
   }
 
+  public streamIdByOwner(id: number) {
+    return this.streaamOwner[id];
+  }
+  
   public get networkData(): vis.Data {
     return this.data;
   }
@@ -53,7 +57,8 @@ export class DataProviderService {
         (stream: Stream, viewers: ViewersList) => ({ stream: stream, viewers: viewers })
 
       )
-      .do(x => {++it; this.OnRequestStatus.next({ status: Status.INPROGRESS, progress: Math.round(100 / streams.length * it) })})
+        .do(stream => this.streaamOwner[stream.stream.owner.id] = stream.stream.id)
+        .do(x => { ++it; this.OnRequestStatus.next({ status: Status.INPROGRESS, progress: Math.round(100 / streams.length * it) }) })
         .toArray())
       .subscribe({
         next: streams => {

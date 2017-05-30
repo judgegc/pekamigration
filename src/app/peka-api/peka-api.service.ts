@@ -8,6 +8,7 @@ import { Content } from './resources/content';
 import { ViewersList } from './resources/viewers-list';
 import { Bulk } from './resources/bulk';
 import { CurrentBonuses } from './resources/currentbonuses';
+import { JoinChat } from './resources/chat-join';
 
 @Injectable()
 export class PekaApiService {
@@ -19,7 +20,7 @@ export class PekaApiService {
 
   constructor(private http: Http) {}
 
-  private get socket(): SocketIOClient.Socket
+  public get socket(): SocketIOClient.Socket
   {
 
     if(this.ws == null)
@@ -36,6 +37,7 @@ export class PekaApiService {
 
     return this.ws;
   }
+
 
   public getStreams(): Observable<any>
   {
@@ -60,5 +62,13 @@ export class PekaApiService {
     return new CurrentBonuses()
     .execute(PekaApiService.wsEntryPoint, this.socket);
   }
+
+  public joinChat(channel: string): Observable<any>
+  {
+    return new JoinChat({channel: channel})
+    .execute(PekaApiService.wsEntryPoint, this.socket);
+  }
+
+  
 
 }

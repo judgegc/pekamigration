@@ -14,6 +14,7 @@ import { ViewportComponent } from './viewport/viewport.component';
 import { SearchBoxComponent } from './search-box/search-box.component';
 import { DescriptionComponent } from './description/description.component';
 import { SettingsComponent } from './settings/settings.component'; 
+import { AllChatsListenerService } from './all-chats-listener.service';
 
 @NgModule({
   declarations: [
@@ -27,10 +28,10 @@ import { SettingsComponent } from './settings/settings.component';
     BrowserModule,
     FormsModule,
     HttpModule,
-    MaterialModule.forRoot(),
+    MaterialModule,
     BrowserAnimationsModule
   ],
-  providers: [PekaApiService, DataProviderService],
+  providers: [PekaApiService, DataProviderService, AllChatsListenerService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
