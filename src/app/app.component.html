@@ -4,7 +4,7 @@
     </md-sidenav>
 
     <viewport [networkData]="data" (deselectNode)="deselectNode($event)" (selectNode)="selectNode($event)" (stabilized)="stabilized($event)"></viewport>
-    <md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress"></md-progress-bar>
+    <md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress" [color]="'accent'"></md-progress-bar>
 
     <section class="info-panel">
         <search-box [nodes]="nodes()" (searchComplete)="searchComplete($event)"></search-box>

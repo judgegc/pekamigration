@@ -7,8 +7,8 @@
     <md-option *ngFor="let variant of getAutocompleteList()" [value]="variant.name" (click)="OnClickAutoselectItem(variant)">
       {{ variant.name }}
       <md-chip-list [ngSwitch]="variant.group">
-        <md-chip color="primary" selected="true" *ngSwitchCase="'viewer'">{{variant.name.length > 8? 'З': 'Зритель'}}</md-chip>
-        <md-chip color="accent" selected="true" *ngSwitchCase="'streamer'">{{variant.name.length > 8? 'С': 'Стример'}}</md-chip>
+        <md-chip color="primary" selected="true" *ngSwitchCase="'viewer'">{{variant.name | roleShorter:'Зритель'}}</md-chip>
+        <md-chip color="accent" selected="true" *ngSwitchCase="'streamer'">{{variant.name | roleShorter:'Стример'}}</md-chip>
         <md-chip color="warn" selected="true" *ngSwitchCase="'peka'">Пека</md-chip>
       </md-chip-list>
     </md-option>

@@ -15,6 +15,7 @@ import { SearchBoxComponent } from './search-box/search-box.component';
 import { DescriptionComponent } from './description/description.component';
 import { SettingsComponent } from './settings/settings.component'; 
 import { AllChatsListenerService } from './all-chats-listener.service';
+import { RoleShortenerPipe } from './role-shortener.pipe';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { AllChatsListenerService } from './all-chats-listener.service';
     ViewportComponent,
     SearchBoxComponent,
     DescriptionComponent,
-    SettingsComponent
+    SettingsComponent,
+    RoleShortenerPipe
   ],
   imports: [
     BrowserModule,
