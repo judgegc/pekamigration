@@ -7,7 +7,7 @@
     <md-progress-bar *ngIf="requestInProgress" class="request-status" mode="Determinate" [value]="requestProgress" [color]="'accent'"></md-progress-bar>
 
     <section class="info-panel">
-        <search-box [nodes]="nodes()" (searchComplete)="searchComplete($event)"></search-box>
+        <search-box [nodes]="nodes" (searchComplete)="searchComplete($event)"></search-box>
         <description [hidden]="!isShowDescription"></description>
     </section>
 

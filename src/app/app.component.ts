@@ -16,6 +16,7 @@ import { NetworkSettings } from './config/network-settings';
 import { IMessage } from './peka-api/types/message.interface';
 
 import { ChatsActivitiesVisualizer } from './modules/chats-activities-visualizer';
+import { Diff } from './diff';
 
 import * as io from 'socket.io-client';
 import * as vis from 'vis';
@@ -57,11 +58,11 @@ export class AppComponent {
   public constructor(private dataProvider: DataProviderService, private chatListener: AllChatsListenerService, mdIconRegistry: MdIconRegistry, sanitizer: DomSanitizer) {
 
     mdIconRegistry.addSvgIcon('settings', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/md-settings.svg'));
-    
+
     this.options = NetworkSettings;
 
     this.chatListener.start();
-    
+
     this.dataProvider.OnRequestStatus.subscribe({
       next: (x: RequestStatus) => {
         switch (x.status) {
@@ -79,12 +80,16 @@ export class AppComponent {
       }
     });
 
+    this.dataProvider.OnAfterUpdate.subscribe({
+      next: (x: Diff) => this.messagesVisualizer.removeOutdated(x.edges.remove.map(e => NetworkHelper.getEdgeId({ from: e.from, to: e.to })))
+    });
+
     this._data = this.dataProvider.networkData;
     this.dataProvider.startWatch();
 
   }
 
-  public nodes() {
+  public get nodes() {
     return this._data.nodes;
   }
   //event from viewport 

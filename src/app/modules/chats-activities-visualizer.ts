@@ -25,6 +25,11 @@ export class ChatsActivitiesVisualizer {
 
     }
 
+    public removeOutdated(edges: number[])
+    {
+        this.activeEdges = this.activeEdges.filter( x => edges.indexOf(x.id));
+    }
+
     private startVisualize() {
         this.watchTimer = setTimeout(() => this.check(), this.CHECK_INTERVAL);
 
@@ -59,6 +64,7 @@ export class ChatsActivitiesVisualizer {
         return this.avaliavleColors[Math.floor(Math.random() * this.avaliavleColors.length)];
     }
 
+
     private check() {
         let resetEdges: number[] = [];
         let i = 0;
@@ -66,17 +72,12 @@ export class ChatsActivitiesVisualizer {
             resetEdges.push(this.activeEdges[i].id);
         }
 
-        /*
-        Возможно текут edges (update() создает если не существует).
-        Если написать в чат и сразу выйти, то при смене стиля на дефолтный update() не найдет edge и создаст новую.
-        */
         (this.network.data.edges as vis.DataSet<vis.Edge>)
             .update(resetEdges.map(id => Object.assign({ id: id }, { width: NetworkSettings.edges.width, color: NetworkSettings.edges.color })));
-        
+
         this.activeEdges.splice(0, i);
 
         if (this.isRunning)
             this.watchTimer = setTimeout(() => this.check(), this.CHECK_INTERVAL);
-
     }
 }

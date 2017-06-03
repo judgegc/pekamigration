@@ -8,6 +8,7 @@ import { Owner } from './peka-api/owner.interface';
 import { NetworkHelper } from './network-helper';
 import { SnapshotComparator } from './snapshot-comparator';
 import { RequestStatus, Status } from './request-status.interface';
+import { Diff } from './diff';
 
 import * as vis from 'vis';
 
@@ -23,6 +24,7 @@ export class DataProviderService {
   private streaamOwner: { [owner: number]: number; } = {};
 
   public OnRequestStatus = new Subject();
+  public OnAfterUpdate = new Subject<Diff>();
 
   constructor(private api: PekaApiService) {
     this.data = {
@@ -119,6 +121,8 @@ export class DataProviderService {
           this.watchTimer = setTimeout(() => this.startWatch(), this.UPDATE_INTERVAL);
 
           this.OnRequestStatus.next({ status: Status.END });
+
+          this.OnAfterUpdate.next(diffs);
 
         }, error: e => {
           console.error('Ошибка, код красный!');
