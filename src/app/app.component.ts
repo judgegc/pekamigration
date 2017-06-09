@@ -136,8 +136,8 @@ export class AppComponent {
 
   public settingChange(opt: { name: string, value: any }) {
     switch (opt.name) {
-      case 'dragNodes':
-        this.options.interaction.dragNodes = opt.value;
+      case 'soundEffects':
+        this.messagesVisualizer.enableSoundEffects(opt.value);
         break;
     }
 

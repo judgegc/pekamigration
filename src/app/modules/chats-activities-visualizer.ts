@@ -5,6 +5,7 @@ import { IMessage } from './../peka-api/types/message.interface';
 import { DataProviderService } from './../data-provider.service';
 import { NetworkHelper } from './../network-helper';
 import { NetworkSettings } from './../config/network-settings';
+import { SoundEffect } from './../audio/sound-effect';
 
 export class ChatsActivitiesVisualizer {
     private readonly CHECK_INTERVAL = 200;
@@ -14,8 +15,18 @@ export class ChatsActivitiesVisualizer {
     private watchTimer;
     private activeStateStyle = (color) => ({ width: 5, color: { color: color } });
     private avaliavleColors = ['#f50057', '#1e88e5', '#e040fb', '#4caf50', '#fbc02d', '#4e342e'];
-
-    public constructor(private network: ViewportComponent, private chatListener: AllChatsListenerService, private dataProvider: DataProviderService) { }
+    private effects: SoundEffect[];
+    private soundEffects: boolean = false;
+    public constructor(private network: ViewportComponent, private chatListener: AllChatsListenerService, private dataProvider: DataProviderService) {
+        this.effects = [
+            new SoundEffect('assets/sounds/dry_water_drops_1.mp3'),
+            new SoundEffect('assets/sounds/dry_water_drops_2.mp3'),
+            new SoundEffect('assets/sounds/dry_water_drops_3.mp3'),
+            new SoundEffect('assets/sounds/dry_water_drops_4.mp3'),
+            new SoundEffect('assets/sounds/dry_water_drops_5.mp3'),
+            new SoundEffect('assets/sounds/dry_water_drops_6.mp3'),
+        ];
+    }
 
     public start() {
         if (!this.isRunning) {
@@ -24,10 +35,12 @@ export class ChatsActivitiesVisualizer {
         }
 
     }
+    public enableSoundEffects(enable: boolean) {
+        this.soundEffects = enable;
+    }
 
-    public removeOutdated(edges: number[])
-    {
-        this.activeEdges = this.activeEdges.filter( x => edges.indexOf(x.id));
+    public removeOutdated(edges: number[]) {
+        this.activeEdges = this.activeEdges.filter(x => edges.indexOf(x.id));
     }
 
     private startVisualize() {
@@ -55,7 +68,11 @@ export class ChatsActivitiesVisualizer {
 
                     this.activeEdges.push({ id: senderToStreamEdgeId, timestamp: Date.now() });
                 }
-
+                if (this.soundEffects) {
+                    let source = this.network.getNodePosition(senderId);
+                    if (source !== undefined)
+                        this.playRandomEffect({ x: source.x, y: source.y, z: 10 }, { x: this.network.cameraPosition.x, y: this.network.cameraPosition.y, z: 20 });
+                }
             }
         });
     }
@@ -79,5 +96,9 @@ export class ChatsActivitiesVisualizer {
 
         if (this.isRunning)
             this.watchTimer = setTimeout(() => this.check(), this.CHECK_INTERVAL);
+    }
+
+    private playRandomEffect(source: { x: number, y: number, z: number }, listener: { x: number, y: number, z: number }) {
+        this.effects[Math.floor(Math.random() * this.effects.length)].play(source, listener)
     }
 }

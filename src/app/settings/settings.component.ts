@@ -10,14 +10,14 @@ export class SettingsComponent implements OnInit {
 
   constructor() { }
 
-   @Input() options: {dragNodes: boolean};
+   @Input() options: {soundEffects: boolean};
    @Output() change = new EventEmitter<{name: string, value: any}>();
 
   ngOnInit() {
   }
 
-  public dragNodesChange(e: MdSlideToggleChange) {
-    this.change.emit({name: 'dragNodes', value: e.checked});
+  public soundEffectsChange(e: MdSlideToggleChange) {
+    this.change.emit({name: 'soundEffects', value: e.checked});
   }
 
 }

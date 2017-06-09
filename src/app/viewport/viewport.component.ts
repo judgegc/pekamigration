@@ -17,8 +17,7 @@ export class ViewportComponent {
 
   private network: vis.Network;
 
-  public get data()
-  {
+  public get data() {
     return this.networkData;
   }
 
@@ -54,6 +53,14 @@ export class ViewportComponent {
       totalUsers: (this.networkData.nodes as vis.DataSet<vis.Node>).length - totalStreamers
     };
 
+  }
+
+  public get cameraPosition() {
+    return this.network.getViewPosition();
+  }
+
+  public getNodePosition(id: number) {
+    return this.network.getPositions([id])[id];
   }
 
   public setOptions(options: vis.Options) {
